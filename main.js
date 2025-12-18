@@ -4,6 +4,12 @@ const files = {
   flags: 'data/flags.json'
 };
 
+const npcMeta = {
+  '宗门执事·白须老者': { avatar: 'assets/npcs/elder.png' },
+  '外门弟子·赵三': { avatar: 'assets/npcs/zhao3.png' },
+  '考核弟子·陈七': { avatar: 'assets/npcs/chen7.png' }
+};
+
 const dom = {
   questTitle: document.getElementById('quest-title'),
   questGoal: document.getElementById('quest-goal'),
@@ -133,9 +139,16 @@ function updateNpcName() {
   const quest = currentQuest();
   if (!quest) return;
   dom.npcName.textContent = quest.npc;
+  const avatarEl = document.getElementById('npc-avatar');
+  if (avatarEl) {
+    const npc = npcMeta[quest.npc] || {};
+    avatarEl.src = npc.avatar || 'assets/npcs/placeholder.png';
+    avatarEl.alt = quest.npc;
+  }
 }
 
 function handleDialogue() {
+  updateNpcName();
   const quest = currentQuest();
   if (!quest) return;
   const lines = npcLinesForQuest(quest.id);
@@ -261,6 +274,7 @@ function resetProgress() {
   localStorage.removeItem(STORAGE_KEY);
   setLog('进度已重置，重新从宗门山门开始。');
   renderQuest();
+  updateNpcName();
   renderStatus();
   renderDialogue('尚未触发对话');
   renderSummary();
