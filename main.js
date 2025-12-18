@@ -31,6 +31,7 @@ const dom = {
 };
 
 const STORAGE_KEY = 'chapter1-progress';
+const placeholderAvatar = 'assets/npcs/placeholder.png';
 let quests = [];
 let dialogues = {};
 let flags = {};
@@ -131,13 +132,20 @@ function npcLinesForQuest(id) {
 
 function updateNpcName() {
   const quest = currentQuest();
-  if (!quest) return;
+  const avatarEl = document.getElementById('npc-avatar');
+  const avatarSrc = quest?.avatar || placeholderAvatar;
+  if (avatarEl) avatarEl.src = avatarSrc;
+  if (!quest) {
+    dom.npcName.textContent = '-';
+    return;
+  }
   dom.npcName.textContent = quest.npc;
 }
 
 function handleDialogue() {
   const quest = currentQuest();
   if (!quest) return;
+  updateNpcName();
   const lines = npcLinesForQuest(quest.id);
   const line = lines[state.dialogueIndex];
   if (line) {
@@ -263,6 +271,7 @@ function resetProgress() {
   renderQuest();
   renderStatus();
   renderDialogue('尚未触发对话');
+  updateNpcName();
   renderSummary();
   updateButtons();
 }
