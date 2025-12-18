@@ -12,6 +12,7 @@ const dom = {
   npcName: document.getElementById('npc-name'),
   dialogueBox: document.getElementById('dialogue-box'),
   nextDialogue: document.getElementById('next-dialogue'),
+  npcAvatar: document.getElementById('npc-avatar'),
   yieldBtn: document.getElementById('yield-btn'),
   fightBtn: document.getElementById('fight-btn'),
   areaButtons: document.querySelectorAll('.area'),
@@ -34,6 +35,7 @@ const STORAGE_KEY = 'chapter1-progress';
 let quests = [];
 let dialogues = {};
 let flags = {};
+const NPC_PLACEHOLDER = 'assets/npcs/placeholder.png';
 
 const defaultState = {
   activeQuest: 'Q001',
@@ -116,16 +118,29 @@ function renderDialogue(text) {
   dom.dialogueBox.innerHTML = `<p>${text}</p>`;
 }
 
-function npcLinesForQuest(id) {
+function getNpcData(dialogues, npcName) {
+  const data = dialogues ? dialogues[npcName] : null;
+  if (Array.isArray(data)) {
+    return { avatar: NPC_PLACEHOLDER, lines: data };
+  }
+  if (data && typeof data === 'object') {
+    const avatar = data.avatar || NPC_PLACEHOLDER;
+    const lines = Array.isArray(data.lines) ? data.lines : [];
+    return { avatar, lines };
+  }
+  return { avatar: NPC_PLACEHOLDER, lines: [] };
+}
+
+function npcDataForQuest(id) {
   switch (id) {
     case 'Q001':
-      return dialogues['宗门执事·白须老者'];
+      return getNpcData(dialogues, '宗门执事·白须老者');
     case 'Q002':
-      return dialogues['外门弟子·赵三'];
+      return getNpcData(dialogues, '外门弟子·赵三');
     case 'Q003':
-      return dialogues['考核弟子·陈七'];
+      return getNpcData(dialogues, '考核弟子·陈七');
     default:
-      return [];
+      return { avatar: NPC_PLACEHOLDER, lines: [] };
   }
 }
 
@@ -138,8 +153,11 @@ function updateNpcName() {
 function handleDialogue() {
   const quest = currentQuest();
   if (!quest) return;
-  const lines = npcLinesForQuest(quest.id);
-  const line = lines[state.dialogueIndex];
+  const npc = npcDataForQuest(quest.id);
+  if (dom.npcAvatar) {
+    dom.npcAvatar.src = npc.avatar || NPC_PLACEHOLDER;
+  }
+  const line = npc.lines[state.dialogueIndex];
   if (line) {
     renderDialogue(`${quest.npc}：${line}`);
     state.dialogueIndex += 1;
@@ -269,7 +287,7 @@ function resetProgress() {
 
 function buildExportText() {
   const parts = quests.map(q => {
-    const npcTalk = npcLinesForQuest(q.id).map((line, idx) => `${idx + 1}. ${line}`).join('\n');
+    const npcTalk = npcDataForQuest(q.id).lines.map((line, idx) => `${idx + 1}. ${line}`).join('\n');
     let extra = '';
     if (q.id === 'Q003') {
       extra = '\n【分支台词】\n- 退让：嗯，知道退，说明你有命修仙。\n- 硬拼：记住这次疼，下次别犯。';
