@@ -13,8 +13,8 @@
       <h1>宗门起步任务</h1>
       <p class="lede">按顺序推进宗门登记、采药试炼、初战考验，所有进度自动保存在浏览器。</p>
       <div class="hero__actions">
-        <button id="reset-btn" class="ghost">重置进度</button>
-        <button id="export-btn" class="primary">导出剧情/台词</button>
+        <button id="btnReset" class="ghost">重置进度</button>
+        <button id="btnExport" class="primary">导出剧情/台词</button>
       </div>
     </div>
     <div class="hero__illus" aria-hidden="true">
@@ -40,10 +40,13 @@
         </article>
         <article class="chapter-card">
           <h3>NPC 对话</h3>
-          <p class="eyebrow" id="npc-name">-</p>
-          <div id="dialogue-box" class="dialogue-box">尚未触发对话</div>
+          <div class="npc-meta">
+            <div id="npc-avatar" class="npc-avatar" aria-hidden="true"></div>
+            <p class="eyebrow" id="npc-name">-</p>
+          </div>
+          <div id="npc-text" class="dialogue-box">尚未触发对话</div>
           <div class="chip-row">
-            <button id="next-dialogue" class="primary">对话下一句</button>
+            <button id="btnNext" class="primary">对话下一句</button>
             <button id="yield-btn" class="ghost" disabled>退让</button>
             <button id="fight-btn" class="ghost" disabled>硬拼</button>
           </div>

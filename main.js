@@ -10,8 +10,9 @@ const dom = {
   questConditions: document.getElementById('quest-conditions'),
   questPill: document.getElementById('quest-pill'),
   npcName: document.getElementById('npc-name'),
-  dialogueBox: document.getElementById('dialogue-box'),
-  nextDialogue: document.getElementById('next-dialogue'),
+  npcAvatar: document.getElementById('npc-avatar'),
+  npcText: document.getElementById('npc-text'),
+  btnNext: document.getElementById('btnNext'),
   yieldBtn: document.getElementById('yield-btn'),
   fightBtn: document.getElementById('fight-btn'),
   areaButtons: document.querySelectorAll('.area'),
@@ -23,8 +24,8 @@ const dom = {
   bag: document.getElementById('player-bag'),
   summary: document.getElementById('summary-box'),
   rewardPill: document.getElementById('reward-pill'),
-  reset: document.getElementById('reset-btn'),
-  exportBtn: document.getElementById('export-btn'),
+  reset: document.getElementById('btnReset'),
+  exportBtn: document.getElementById('btnExport'),
   modal: document.getElementById('export-modal'),
   closeModal: document.getElementById('close-modal'),
   exportText: document.getElementById('export-text')
@@ -113,7 +114,7 @@ function renderStatus() {
 }
 
 function renderDialogue(text) {
-  dom.dialogueBox.innerHTML = `<p>${text}</p>`;
+  dom.npcText.innerHTML = `<p>${text}</p>`;
 }
 
 function npcLinesForQuest(id) {
@@ -133,6 +134,9 @@ function updateNpcName() {
   const quest = currentQuest();
   if (!quest) return;
   dom.npcName.textContent = quest.npc;
+  if (dom.npcAvatar) {
+    dom.npcAvatar.setAttribute('title', quest.npc);
+  }
 }
 
 function handleDialogue() {
@@ -302,9 +306,9 @@ async function bootstrap() {
     renderSummary();
     updateButtons();
     dom.locationPill.textContent = state.location;
-    dom.dialogueBox.textContent = '点击“对话下一句”开始交流。';
+    dom.npcText.textContent = '点击“对话下一句”开始交流。';
 
-    dom.nextDialogue.addEventListener('click', handleDialogue);
+    dom.btnNext.addEventListener('click', handleDialogue);
     dom.yieldBtn.addEventListener('click', () => completeChapter('yield'));
     dom.fightBtn.addEventListener('click', () => completeChapter('fight'));
     dom.collectBtn.addEventListener('click', collectHerb);
