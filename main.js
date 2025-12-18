@@ -4,12 +4,15 @@ const files = {
   flags: 'data/flags.json'
 };
 
+const PLACEHOLDER_AVATAR = 'assets/npcs/placeholder.png';
+
 const dom = {
   questTitle: document.getElementById('quest-title'),
   questGoal: document.getElementById('quest-goal'),
   questConditions: document.getElementById('quest-conditions'),
   questPill: document.getElementById('quest-pill'),
   npcName: document.getElementById('npc-name'),
+  npcAvatar: document.getElementById('npc-avatar'),
   dialogueBox: document.getElementById('dialogue-box'),
   nextDialogue: document.getElementById('next-dialogue'),
   yieldBtn: document.getElementById('yield-btn'),
@@ -116,29 +119,31 @@ function renderDialogue(text) {
   dom.dialogueBox.innerHTML = `<p>${text}</p>`;
 }
 
-function npcLinesForQuest(id) {
-  switch (id) {
-    case 'Q001':
-      return dialogues['宗门执事·白须老者'];
-    case 'Q002':
-      return dialogues['外门弟子·赵三'];
-    case 'Q003':
-      return dialogues['考核弟子·陈七'];
-    default:
-      return [];
-  }
+function getNpcData(name) {
+  const npc = dialogues[name] || {};
+  return {
+    avatar: npc.avatar || PLACEHOLDER_AVATAR,
+    lines: npc.lines || []
+  };
 }
 
 function updateNpcName() {
   const quest = currentQuest();
-  if (!quest) return;
+  if (!quest) {
+    dom.npcName.textContent = '-';
+    dom.npcAvatar.src = PLACEHOLDER_AVATAR;
+    return;
+  }
   dom.npcName.textContent = quest.npc;
+  const npcData = getNpcData(quest.npc);
+  dom.npcAvatar.src = npcData.avatar;
 }
 
 function handleDialogue() {
   const quest = currentQuest();
   if (!quest) return;
-  const lines = npcLinesForQuest(quest.id);
+  const npcData = getNpcData(quest.npc);
+  const lines = npcData.lines;
   const line = lines[state.dialogueIndex];
   if (line) {
     renderDialogue(`${quest.npc}：${line}`);
@@ -205,7 +210,7 @@ function renderSummary() {
     ? '嗯，知道退，说明你有命修仙。'
     : '记住这次疼，下次别犯。';
   dom.summary.innerHTML = `
-    <p><strong>考核弟子·陈七：</strong>${branchText}</p>
+    <p><strong>守门人·陈七：</strong>${branchText}</p>
     <p><strong>奖励：</strong>${state.reward} 已收入背包。</p>
     <p><strong>宗门执事：</strong>若你能活过外门三月，再谈修行二字。</p>
   `;
@@ -261,6 +266,7 @@ function resetProgress() {
   localStorage.removeItem(STORAGE_KEY);
   setLog('进度已重置，重新从宗门山门开始。');
   renderQuest();
+  updateNpcName();
   renderStatus();
   renderDialogue('尚未触发对话');
   renderSummary();
@@ -269,7 +275,8 @@ function resetProgress() {
 
 function buildExportText() {
   const parts = quests.map(q => {
-    const npcTalk = npcLinesForQuest(q.id).map((line, idx) => `${idx + 1}. ${line}`).join('\n');
+    const npcData = getNpcData(q.npc);
+    const npcTalk = npcData.lines.map((line, idx) => `${idx + 1}. ${line}`).join('\n');
     let extra = '';
     if (q.id === 'Q003') {
       extra = '\n【分支台词】\n- 退让：嗯，知道退，说明你有命修仙。\n- 硬拼：记住这次疼，下次别犯。';
