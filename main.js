@@ -4,6 +4,8 @@ const files = {
   flags: 'data/flags.json'
 };
 
+const defaultAvatar = 'assets/npcs/placeholder.png';
+
 const dom = {
   questTitle: document.getElementById('quest-title'),
   questGoal: document.getElementById('quest-goal'),
@@ -75,6 +77,12 @@ function setLog(text) {
   dom.log.textContent = `[${time}] ${text}`;
 }
 
+function setNpcAvatar(src) {
+  const avatar = document.getElementById('npc-avatar');
+  if (!avatar) return;
+  avatar.src = src || defaultAvatar;
+}
+
 function currentQuest() {
   return quests.find(q => q.id === state.activeQuest);
 }
@@ -116,30 +124,54 @@ function renderDialogue(text) {
   dom.dialogueBox.innerHTML = `<p>${text}</p>`;
 }
 
-function npcLinesForQuest(id) {
+function getNpcData(npcKey) {
+  const data = dialogues[npcKey];
+  if (Array.isArray(data)) {
+    return { lines: data, avatar: defaultAvatar };
+  }
+  if (data && typeof data === 'object') {
+    const lines = Array.isArray(data.lines) ? data.lines : [];
+    return { lines, avatar: data.avatar || defaultAvatar };
+  }
+  return { lines: [], avatar: defaultAvatar };
+}
+
+function npcDataForQuest(id) {
+  let key = '';
   switch (id) {
     case 'Q001':
-      return dialogues['宗门执事·白须老者'];
+      key = '宗门执事·白须老者';
+      break;
     case 'Q002':
-      return dialogues['外门弟子·赵三'];
+      key = '外门弟子·赵三';
+      break;
     case 'Q003':
-      return dialogues['考核弟子·陈七'];
+      key = '考核弟子·陈七';
+      break;
     default:
-      return [];
+      return { lines: [], avatar: defaultAvatar };
   }
+  return getNpcData(key);
+}
+
+function npcLinesForQuest(id) {
+  return npcDataForQuest(id).lines;
 }
 
 function updateNpcName() {
   const quest = currentQuest();
   if (!quest) return;
   dom.npcName.textContent = quest.npc;
+  const npcData = npcDataForQuest(quest.id);
+  setNpcAvatar(npcData.avatar);
 }
 
 function handleDialogue() {
   const quest = currentQuest();
   if (!quest) return;
-  const lines = npcLinesForQuest(quest.id);
-  const line = lines[state.dialogueIndex];
+  const npcData = npcDataForQuest(quest.id);
+  const line = npcData.lines[state.dialogueIndex];
+  setNpcAvatar(npcData.avatar);
   if (line) {
     renderDialogue(`${quest.npc}：${line}`);
     state.dialogueIndex += 1;
