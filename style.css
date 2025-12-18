@@ -22,6 +22,10 @@ body {
   min-height: 100vh;
 }
 
+body.bg-gradient-to-b {
+  background: linear-gradient(180deg, #0f172a 0%, #0b1221 55%, #0f172a 100%);
+}
+
 .hero {
   display: grid;
   gap: 28px;
@@ -130,6 +134,16 @@ button { cursor: pointer; font-family: inherit; }
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(251, 248, 242, 0.9));
   display: grid; gap: 10px;
   box-shadow: 0 10px 20px rgba(71, 58, 40, 0.1);
+}
+
+.chapter-card.npc-tailwind-card {
+  background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.16), transparent 32%),
+              radial-gradient(circle at 90% 0%, rgba(56, 189, 248, 0.12), transparent 30%),
+              linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(17, 24, 39, 0.88));
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
 }
 .chapter-card h3 { margin: 0; letter-spacing: 0.5px; }
 .chapter-card ul { margin: 0; padding-left: 18px; color: var(--muted); }

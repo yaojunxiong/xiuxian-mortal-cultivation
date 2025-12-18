@@ -148,7 +148,7 @@ function updateNpcDisplay() {
     dom.npcName.textContent = npc.name;
   }
 
-  const avatarEl = document.getElementById('npc-avatar');
+  const avatarEl = dom.npcAvatar || document.getElementById('npc-avatar');
   if (avatarEl) {
     avatarEl.src = npc.avatar || 'assets/npcs/placeholder.png';
     avatarEl.alt = npc.name ? `${npc.name} 头像` : 'NPC Avatar';
