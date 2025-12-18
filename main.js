@@ -18,7 +18,12 @@ const dom = {
   journal: document.getElementById('journal'),
   journalCount: document.getElementById('journal-count'),
   advance: document.getElementById('advance-btn'),
-  export: document.getElementById('export-btn')
+  export: document.getElementById('export-btn'),
+  exportModal: document.getElementById('export-modal'),
+  exportText: document.getElementById('export-text'),
+  exportCopy: document.getElementById('export-copy'),
+  exportSelect: document.getElementById('export-select'),
+  exportClose: document.getElementById('export-close')
 };
 
 async function loadJSON(path) {
@@ -110,13 +115,30 @@ function updateExportText(profile, journal) {
   return lines.join('\n');
 }
 
-function saveBlob(content, filename) {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(link.href);
+function openExportModal(content) {
+  dom.exportText.value = content;
+  dom.exportModal.classList.add('is-visible');
+  dom.exportModal.setAttribute('aria-hidden', 'false');
+  dom.exportText.focus();
+  dom.exportText.select();
+}
+
+function closeExportModal() {
+  dom.exportModal.classList.remove('is-visible');
+  dom.exportModal.setAttribute('aria-hidden', 'true');
+}
+
+function copyExportText() {
+  const value = dom.exportText.value;
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(value).catch(() => {
+      dom.exportText.select();
+      document.execCommand('copy');
+    });
+  } else {
+    dom.exportText.select();
+    document.execCommand('copy');
+  }
 }
 
 function appendJournal(journal) {
@@ -156,7 +178,22 @@ async function bootstrap() {
 
     dom.export.addEventListener('click', () => {
       const text = updateExportText(profile, journal);
-      saveBlob(text, 'cultivation-notes.txt');
+      openExportModal(text);
+    });
+
+    dom.exportCopy.addEventListener('click', copyExportText);
+    dom.exportSelect.addEventListener('click', () => dom.exportText.select());
+    dom.exportClose.addEventListener('click', closeExportModal);
+    dom.exportModal.addEventListener('click', (event) => {
+      if (event.target.dataset.dismiss !== undefined) {
+        closeExportModal();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && dom.exportModal.classList.contains('is-visible')) {
+        closeExportModal();
+      }
     });
   } catch (err) {
     console.error(err);
