@@ -10,6 +10,7 @@ const dom = {
   questConditions: document.getElementById('quest-conditions'),
   questPill: document.getElementById('quest-pill'),
   npcName: document.getElementById('npc-name'),
+  npcAvatar: document.getElementById('npc-avatar'),
   dialogueBox: document.getElementById('dialogue-box'),
   nextDialogue: document.getElementById('next-dialogue'),
   yieldBtn: document.getElementById('yield-btn'),
@@ -31,6 +32,16 @@ const dom = {
 };
 
 const STORAGE_KEY = 'chapter1-progress';
+const SITE_BASE = window.location.pathname.includes('/xiuxian-mortal-cultivation')
+  ? '/xiuxian-mortal-cultivation/'
+  : './';
+const AVATAR_BASE = `${SITE_BASE}assets/npcs/`;
+const NPC_AVATARS = {
+  Q001: 'elder.png',
+  Q002: 'zhao3.png',
+  Q003: 'chen7.png'
+};
+const DEFAULT_AVATAR = 'placeholder.png';
 let quests = [];
 let dialogues = {};
 let flags = {};
@@ -129,10 +140,13 @@ function npcLinesForQuest(id) {
   }
 }
 
-function updateNpcName() {
+function updateNpcDisplay() {
   const quest = currentQuest();
   if (!quest) return;
   dom.npcName.textContent = quest.npc;
+  const filename = NPC_AVATARS[quest.id] || DEFAULT_AVATAR;
+  dom.npcAvatar.src = `${AVATAR_BASE}${filename}`;
+  dom.npcAvatar.alt = `${quest.npc} 头像`;
 }
 
 function handleDialogue() {
@@ -141,9 +155,11 @@ function handleDialogue() {
   const lines = npcLinesForQuest(quest.id);
   const line = lines[state.dialogueIndex];
   if (line) {
+    updateNpcDisplay();
     renderDialogue(`${quest.npc}：${line}`);
     state.dialogueIndex += 1;
   } else {
+    updateNpcDisplay();
     renderDialogue('该说的都说完了。继续完成任务目标吧。');
     if (quest.id === 'Q001') finishQ001();
     if (quest.id === 'Q003') {
@@ -163,7 +179,7 @@ function finishQ001() {
   state.dialogueIndex = 0;
   saveState();
   renderQuest();
-  updateNpcName();
+  updateNpcDisplay();
   renderStatus();
 }
 
@@ -176,7 +192,7 @@ function checkQ002Completion() {
     state.dialogueIndex = 0;
     saveState();
     renderQuest();
-    updateNpcName();
+    updateNpcDisplay();
   }
 }
 
@@ -261,6 +277,7 @@ function resetProgress() {
   localStorage.removeItem(STORAGE_KEY);
   setLog('进度已重置，重新从宗门山门开始。');
   renderQuest();
+  updateNpcDisplay();
   renderStatus();
   renderDialogue('尚未触发对话');
   renderSummary();
@@ -296,7 +313,7 @@ async function bootstrap() {
       loadJSON(files.dialogues),
       loadJSON(files.flags)
     ]);
-    updateNpcName();
+    updateNpcDisplay();
     renderQuest();
     renderStatus();
     renderSummary();
