@@ -9,7 +9,9 @@ const dom = {
   questGoal: document.getElementById('quest-goal'),
   questConditions: document.getElementById('quest-conditions'),
   questPill: document.getElementById('quest-pill'),
+  npcCard: document.getElementById('npc-card'),
   npcName: document.getElementById('npc-name'),
+  npcAvatar: document.getElementById('npc-avatar'),
   dialogueBox: document.getElementById('dialogue-box'),
   nextDialogue: document.getElementById('next-dialogue'),
   yieldBtn: document.getElementById('yield-btn'),
@@ -34,6 +36,12 @@ const STORAGE_KEY = 'chapter1-progress';
 let quests = [];
 let dialogues = {};
 let flags = {};
+
+const npcAvatars = {
+  '宗门执事·白须老者': 'assets/npcs/elder.png',
+  '外门弟子·赵三': 'assets/npcs/zhao3.png',
+  '考核弟子·陈七': 'assets/npcs/chen7.png'
+};
 
 const defaultState = {
   activeQuest: 'Q001',
@@ -129,15 +137,49 @@ function npcLinesForQuest(id) {
   }
 }
 
-function updateNpcName() {
+function ensureNpcAvatarElement() {
+  const header = dom.npcCard?.querySelector('.npc-header');
+  if (!header) return null;
+  if (!dom.npcAvatar || !document.body.contains(dom.npcAvatar)) {
+    const img = document.createElement('img');
+    img.id = 'npc-avatar';
+    img.alt = 'NPC 头像';
+    header.prepend(img);
+    dom.npcAvatar = img;
+  }
+  return dom.npcAvatar;
+}
+
+function getNpcAvatarSrc(name) {
+  return npcAvatars[name] || 'assets/npcs/placeholder.png';
+}
+
+function setNpcAvatarSrc(name) {
+  const avatar = ensureNpcAvatarElement();
+  if (!avatar) return;
+  if (!avatar.dataset.fallbackBound) {
+    avatar.addEventListener('error', () => {
+      if (!avatar.src.includes('assets/npcs/placeholder.png')) {
+        avatar.src = 'assets/npcs/placeholder.png';
+      }
+    });
+    avatar.dataset.fallbackBound = 'true';
+  }
+  avatar.src = getNpcAvatarSrc(name);
+  avatar.alt = `${name} 的头像`;
+}
+
+function updateNpcDisplay() {
   const quest = currentQuest();
   if (!quest) return;
   dom.npcName.textContent = quest.npc;
+  setNpcAvatarSrc(quest.npc);
 }
 
 function handleDialogue() {
   const quest = currentQuest();
   if (!quest) return;
+  updateNpcDisplay();
   const lines = npcLinesForQuest(quest.id);
   const line = lines[state.dialogueIndex];
   if (line) {
@@ -163,7 +205,7 @@ function finishQ001() {
   state.dialogueIndex = 0;
   saveState();
   renderQuest();
-  updateNpcName();
+  updateNpcDisplay();
   renderStatus();
 }
 
@@ -176,7 +218,7 @@ function checkQ002Completion() {
     state.dialogueIndex = 0;
     saveState();
     renderQuest();
-    updateNpcName();
+    updateNpcDisplay();
   }
 }
 
@@ -261,6 +303,7 @@ function resetProgress() {
   localStorage.removeItem(STORAGE_KEY);
   setLog('进度已重置，重新从宗门山门开始。');
   renderQuest();
+  updateNpcDisplay();
   renderStatus();
   renderDialogue('尚未触发对话');
   renderSummary();
@@ -296,7 +339,7 @@ async function bootstrap() {
       loadJSON(files.dialogues),
       loadJSON(files.flags)
     ]);
-    updateNpcName();
+    updateNpcDisplay();
     renderQuest();
     renderStatus();
     renderSummary();
