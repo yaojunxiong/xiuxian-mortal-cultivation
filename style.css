@@ -84,6 +84,7 @@ button { cursor: pointer; }
 .chapter-card {
   padding: 14px; border-radius: 12px; border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02); display: grid; gap: 8px;
+  overflow: visible;
 }
 .chapter-card h3 { margin: 0; }
 .chapter-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
@@ -96,6 +97,26 @@ button { cursor: pointer; }
 }
 .dialogue-box p { margin: 8px 0; }
 .dialogue-box strong { color: var(--accent); }
+.npc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow: visible;
+}
+.npc-title { display: grid; gap: 4px; }
+#npc-avatar {
+  width: 110px;
+  height: 110px;
+  display: block;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  opacity: 1;
+  visibility: visible;
+}
 .chip-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
