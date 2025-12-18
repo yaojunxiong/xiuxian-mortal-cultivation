@@ -133,6 +133,18 @@ button { cursor: pointer; font-family: inherit; }
 }
 .chapter-card h3 { margin: 0; letter-spacing: 0.5px; }
 .chapter-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
+#npc-card .npc-header { display: flex; align-items: center; gap: 12px; }
+#npc-avatar {
+  width: 108px;
+  height: 108px;
+  max-width: 120px;
+  max-height: 120px;
+  min-width: 96px;
+  min-height: 96px;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+}
 .list li { margin-bottom: 4px; }
 .hint { padding: 10px; border-radius: 10px; background: rgba(118, 108, 99, 0.08); color: var(--muted); border: 1px dashed var(--border); }
 
