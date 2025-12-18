@@ -137,43 +137,22 @@ function npcLinesForQuest(id) {
   }
 }
 
-function ensureNpcAvatarElement() {
-  const header = dom.npcCard?.querySelector('.npc-header');
-  if (!header) return null;
-  if (!dom.npcAvatar || !document.body.contains(dom.npcAvatar)) {
-    const img = document.createElement('img');
-    img.id = 'npc-avatar';
-    img.alt = 'NPC 头像';
-    header.prepend(img);
-    dom.npcAvatar = img;
-  }
-  return dom.npcAvatar;
-}
-
-function getNpcAvatarSrc(name) {
-  return npcAvatars[name] || 'assets/npcs/placeholder.png';
-}
-
-function setNpcAvatarSrc(name) {
-  const avatar = ensureNpcAvatarElement();
-  if (!avatar) return;
-  if (!avatar.dataset.fallbackBound) {
-    avatar.addEventListener('error', () => {
-      if (!avatar.src.includes('assets/npcs/placeholder.png')) {
-        avatar.src = 'assets/npcs/placeholder.png';
-      }
-    });
-    avatar.dataset.fallbackBound = 'true';
-  }
-  avatar.src = getNpcAvatarSrc(name);
-  avatar.alt = `${name} 的头像`;
-}
-
 function updateNpcDisplay() {
   const quest = currentQuest();
-  if (!quest) return;
-  dom.npcName.textContent = quest.npc;
-  setNpcAvatarSrc(quest.npc);
+  const npc = {
+    name: quest?.npc || '-',
+    avatar: quest ? npcAvatars[quest.npc] : null
+  };
+
+  if (dom.npcName) {
+    dom.npcName.textContent = npc.name;
+  }
+
+  const avatarEl = document.getElementById('npc-avatar');
+  if (avatarEl) {
+    avatarEl.src = npc.avatar || 'assets/npcs/placeholder.png';
+    avatarEl.alt = npc.name ? `${npc.name} 头像` : 'NPC Avatar';
+  }
 }
 
 function handleDialogue() {
