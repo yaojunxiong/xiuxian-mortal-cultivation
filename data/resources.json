@@ -1,0 +1,8 @@
+[
+  { "category": "丹药", "name": "聚灵丹", "count": 18 },
+  { "category": "草药", "name": "竹节参", "count": 2 },
+  { "category": "灵材", "name": "寒玉碎片", "count": 5 },
+  { "category": "灵符", "name": "静心符", "count": 4 },
+  { "category": "日用", "name": "松烟砖", "count": 12 },
+  { "category": "消耗", "name": "灵石", "count": 36 }
+]

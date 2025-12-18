@@ -1,0 +1,11 @@
+离线修仙档案（可备份到任意设备）
+- profile.json：修士档案与当前目标
+- techniques.json：功法、秘术与阵法记录
+- expeditions.json：游历与小结
+- resources.json：储物袋物资
+- journal.json：日常随记
+
+操作提示：
+1) 直接在浏览器打开 index.html 即可离线查看。
+2) 如需导出，自带“导出当前记事”按钮会生成 txt 下载。
+3) 手动修改 JSON 后刷新页面即可生效。

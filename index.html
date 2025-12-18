@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>离线修仙小筑</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content">
+      <p class="badge">独立修行 · 本地保存</p>
+      <h1>凡人修仙 · 安静小筑</h1>
+      <p class="lede">用最简单的 HTML、CSS 与 JSON 记录你的修行轨迹，不依赖后端，断网亦可静心。</p>
+      <div class="hero__actions">
+        <button id="advance-btn" class="primary">模拟一次闭关</button>
+        <button id="export-btn" class="ghost">导出当前记事</button>
+      </div>
+    </div>
+    <div class="hero__illus" aria-hidden="true">
+      <div class="orbit">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="profile-title">
+      <div class="panel__head">
+        <div>
+          <p class="eyebrow">修士档案</p>
+          <h2 id="profile-title">当前境界</h2>
+        </div>
+        <span id="profile-stage" class="pill">加载中…</span>
+      </div>
+      <div class="profile-grid" id="profile"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="technique-title">
+      <div class="panel__head">
+        <div>
+          <p class="eyebrow">功法与秘术</p>
+          <h2 id="technique-title">常用功法</h2>
+        </div>
+        <span class="pill pill--ghost" id="technique-count">0 条</span>
+      </div>
+      <div class="card-list" id="technique-list"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="expedition-title">
+      <div class="panel__head">
+        <div>
+          <p class="eyebrow">游历 & 笔记</p>
+          <h2 id="expedition-title">历程时间轴</h2>
+        </div>
+        <span class="pill pill--ghost" id="expedition-count">0 段</span>
+      </div>
+      <ol class="timeline" id="expedition"></ol>
+    </section>
+
+    <section class="panel" aria-labelledby="resource-title">
+      <div class="panel__head">
+        <div>
+          <p class="eyebrow">灵材与日常</p>
+          <h2 id="resource-title">储物袋</h2>
+        </div>
+        <span class="pill pill--ghost" id="resource-count">0 种</span>
+      </div>
+      <div class="resource-grid" id="resources"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="journal-title">
+      <div class="panel__head">
+        <div>
+          <p class="eyebrow">静室随记</p>
+          <h2 id="journal-title">本地日志</h2>
+        </div>
+        <span class="pill pill--ghost" id="journal-count">0 条</span>
+      </div>
+      <div class="journal" id="journal"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>此站点完全离线，数据存放于 <code>data/*.json</code>，亦可手动维护。</p>
+    <p>若要备份，将 <code>export/</code> 下的文本拷贝或自行追加新文件。</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
