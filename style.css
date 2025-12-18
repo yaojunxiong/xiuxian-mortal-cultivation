@@ -133,6 +133,16 @@ button { cursor: pointer; font-family: inherit; }
 }
 .chapter-card h3 { margin: 0; letter-spacing: 0.5px; }
 .chapter-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.npc-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.npc-meta { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#npc-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+}
 .list li { margin-bottom: 4px; }
 .hint { padding: 10px; border-radius: 10px; background: rgba(118, 108, 99, 0.08); color: var(--muted); border: 1px dashed var(--border); }
 
