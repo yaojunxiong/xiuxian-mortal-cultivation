@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>みんなの日本語 点读 Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e5e7eb;
+      padding: 14px 18px;
+    }
+    h1 { margin: 0; font-size: 22px; }
+    .small { color: #6b7280; font-size: 13px; line-height: 1.6; }
+    .app {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 18px;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    aside, main {
+      background: white;
+      border-radius: 22px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.07);
+      padding: 16px;
+    }
+    aside {
+      height: calc(100vh - 96px);
+      overflow: auto;
+      position: sticky;
+      top: 82px;
+    }
+    .lesson-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 8px;
+      text-align: left;
+      background: #f3f4f6;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .lesson-btn.active { background: #111827; color: white; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 18px; }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 15px;
+      background: #111827;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.secondary { background: #e5e7eb; color: #111827; }
+    button.blue { background: #2563eb; }
+    .section-title {
+      font-size: 21px;
+      font-weight: 800;
+      margin: 24px 0 12px;
+      padding-left: 10px;
+      border-left: 6px solid #111827;
+    }
+    .card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 18px;
+      margin-bottom: 10px;
+    }
+    .jp {
+      font-size: 22px;
+      line-height: 1.7;
+      cursor: pointer;
+    }
+    .cn { color: #6b7280; font-size: 15px; margin-top: 4px; }
+    .tag { display: inline-block; font-size: 12px; background: #eef2ff; color: #3730a3; border-radius: 999px; padding: 3px 9px; margin-left: 8px; }
+    .notice {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #7c2d12;
+      border-radius: 18px;
+      padding: 13px;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 760px) {
+      .app { grid-template-columns: 1fr; padding: 12px; }
+      aside { position: static; height: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .lesson-btn { text-align: center; margin: 0; }
+      .card { grid-template-columns: 1fr; }
+      .jp { font-size: 19px; }
+      .play { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>みんなの日本語 初級Ⅰ 点读 Demo</h1>
+  <div class="small">基于用户提供 PDF 整理的前 5 课点读框架。点击句子或播放按钮即可朗读日语。</div>
+</header>
+
+<div class="app">
+  <aside id="lessonList"></aside>
+  <main>
+    <div class="notice">
+      当前是第1～5课 demo 版。后续可以继续把第6～25课按同样结构加入。语音使用浏览器自带日语 TTS，手机/iPad/电脑均可使用。
+    </div>
+    <h2 id="lessonTitle"></h2>
+    <div class="small" id="lessonSource"></div>
+    <div class="toolbar">
+      <button onclick="playLesson()">▶ 播放本课</button>
+      <button class="secondary" onclick="stopAudio()">■ 停止</button>
+      <button class="secondary" onclick="toggleChinese()">中文显示/隐藏</button>
+      <button class="secondary" onclick="toggleKanaNote()">说明显示/隐藏</button>
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
+
+<script>
+const lessons = [
+  {
+    id: 1,
+    title: "第1課",
+    source: "PDF 页码：第16页附近。内容：文型、例文。",
+    sections: [
+      { title: "文型", items: [
+        ["わたしは マイク・ミラーです。", "我是迈克・米勒。"],
+        ["サントスさんは 学生じゃ ありません。", "桑托斯先生不是学生。"],
+        ["ミラーさんは 会社員ですか。", "米勒先生是公司职员吗？"],
+        ["サントスさんも 会社員です。", "桑托斯先生也是公司职员。"]
+      ]},
+      { title: "例文", items: [
+        ["マイク・ミラーさんですか。", "您是迈克・米勒先生吗？"],
+        ["はい、マイク・ミラーです。", "是的，我是迈克・米勒。"],
+        ["ミラーさんは 学生ですか。", "米勒先生是学生吗？"],
+        ["いいえ、学生じゃ ありません。", "不，不是学生。"],
+        ["ワンさんは 銀行員ですか。", "王先生是银行职员吗？"],
+        ["いいえ、銀行員じゃ ありません。医者です。", "不，不是银行职员。是医生。"],
+        ["あの 方は どなたですか。", "那位是谁？"],
+        ["ワットさんです。さくら大学の 先生です。", "是瓦特先生。是樱花大学的老师。"],
+        ["グプタさんは 会社員ですか。", "古普塔先生是公司职员吗？"],
+        ["はい、会社員です。", "是，是公司职员。"],
+        ["カリナさんも 会社員ですか。", "卡莉娜也是公司职员吗？"],
+        ["いいえ、カリナさんは 学生です。", "不，卡莉娜是学生。"],
+        ["テレーザちゃんは 何歳ですか。", "特蕾莎几岁？"],
+        ["9歳です。", "9岁。"]
+      ]}
+    ]
+  },
+  {
+    id: 2,
+    title: "第2課",
+    source: "PDF 页码：第24页附近。内容：文型、例文。",
+    sections: [
+      { title: "文型", items: [
+        ["これは 辞書です。", "这是字典。"],
+        ["それは わたしの 傘です。", "那是我的伞。"],
+        ["この 本は わたしのです。", "这本书是我的。"]
+      ]},
+      { title: "例文", items: [
+        ["これは ボールペンですか。", "这是圆珠笔吗？"],
+        ["はい、そうです。", "是的，是。"],
+        ["それは ノートですか。", "那是笔记本吗？"],
+        ["いいえ、これは 手帳です。", "不，这是记事本。"],
+        ["それは 何ですか。", "那是什么？"],
+        ["名刺です。", "是名片。"],
+        ["これは『9』ですか、『ワ』ですか。", "这是『9』还是『ワ』？"],
+        ["『9』です。", "是『9』。"],
+        ["それは 何の 雑誌ですか。", "那是什么杂志？"],
+        ["コンピューターの 雑誌です。", "是电脑杂志。"],
+        ["あれは だれの かばんですか。", "那是谁的包？"],
+        ["佐藤さんの かばんです。", "是佐藤先生/女士的包。"],
+        ["これは ミラーさんのですか。", "这是米勒先生的吗？"],
+        ["いいえ、わたしのじゃ ありません。", "不，不是我的。"],
+        ["この かぎは だれのですか。", "这把钥匙是谁的？"],
+        ["わたしのです。", "是我的。"]
+      ]}
+    ]
+  },
+  {
+    id: 3,
+    title: "第3課",
+    source: "PDF 页码：第32页附近。内容：文型、例文。",
+    sections: [
+      { title: "文型", items: [
+        ["ここは 食堂です。", "这里是食堂。"],
+        ["エレベーターは あそこです。", "电梯在那里。"]
+      ]},
+      { title: "例文", items: [
+        ["ここは 新大阪ですか。", "这里是新大阪吗？"],
+        ["いいえ、そうです。", "是的。"],
+        ["トイレは どこですか。", "洗手间在哪里？"],
+        ["あそこです。", "在那里。"],
+        ["山田さんは どこですか。", "山田先生/女士在哪里？"],
+        ["会議室です。", "在会议室。"],
+        ["事務所は どちらですか。", "办公室在哪边？"],
+        ["あちらです。", "在那边。"],
+        ["お国は どちらですか。", "您是哪个国家的？"],
+        ["アメリカです。", "美国。"],
+        ["それは どこの 靴ですか。", "那是哪国/哪里的鞋？"],
+        ["イタリアの 靴です。", "是意大利鞋。"],
+        ["この 時計は いくらですか。", "这块表多少钱？"],
+        ["18,600円です。", "18,600日元。"]
+      ]}
+    ]
+  },
+  {
+    id: 4,
+    title: "第4課",
+    source: "PDF 页码：第42页附近。内容：文型、例文。",
+    sections: [
+      { title: "文型", items: [
+        ["今 4時5分です。", "现在4点5分。"],
+        ["わたしは 毎朝 6時に 起きます。", "我每天早上6点起床。"],
+        ["わたしは きのう 勉強しました。", "我昨天学习了。"]
+      ]},
+      { title: "例文", items: [
+        ["今 何時ですか。", "现在几点？"],
+        ["2時10分です。", "2点10分。"],
+        ["ニューヨークは 今 何時ですか。", "纽约现在几点？"],
+        ["午前 0時10分です。", "上午0点10分。"],
+        ["休みは 何曜日ですか。", "休息日是星期几？"],
+        ["土曜日と 日曜日です。", "星期六和星期日。"],
+        ["アップル銀行は 何時から 何時までですか。", "苹果银行从几点到几点？"],
+        ["9時から 3時までです。", "从9点到3点。"],
+        ["毎晩 何時に 寝ますか。", "每天晚上几点睡？"],
+        ["11時に 寝ます。", "11点睡。"],
+        ["毎日 何時から 何時まで 勉強しますか。", "每天从几点到几点学习？"],
+        ["朝 9時から 午後 3時まで 勉強します。", "从早上9点到下午3点学习。"],
+        ["土曜日 働きますか。", "星期六工作吗？"],
+        ["いいえ、働きません。", "不，不工作。"],
+        ["きのう 勉強しましたか。", "昨天学习了吗？"],
+        ["いいえ、勉強しませんでした。", "不，没有学习。"]
+      ]}
+    ]
+  },
+  {
+    id: 5,
+    title: "第5課",
+    source: "PDF 页码：第50页附近。内容：文型、例文。",
+    sections: [
+      { title: "文型", items: [
+        ["わたしは 京都へ 行きます。", "我去京都。"],
+        ["わたしは タクシーで うちへ 帰ります。", "我坐出租车回家。"],
+        ["わたしは 家族と 日本へ 来ました。", "我和家人来日本了。"]
+      ]},
+      { title: "例文", items: [
+        ["あした どこへ 行きますか。", "明天去哪里？"],
+        ["奈良へ 行きます。", "去奈良。"],
+        ["日曜日 どこへ 行きましたか。", "星期天去了哪里？"],
+        ["どこへも 行きませんでした。", "哪里也没去。"],
+        ["何で 東京へ 行きますか。", "坐什么去东京？"],
+        ["新幹線で 行きます。", "坐新干线去。"],
+        ["だれと 東京へ 行きますか。", "和谁去东京？"],
+        ["山田さんと 行きます。", "和山田先生/女士去。"],
+        ["いつ 日本へ 来ましたか。", "什么时候来日本的？"],
+        ["3月25日に 来ました。", "3月25日来的。"],
+        ["誕生日は いつですか。", "生日是什么时候？"],
+        ["6月13日です。", "6月13日。"]
+      ]}
+    ]
+  }
+];
+
+let currentLesson = 0;
+let showChinese = true;
+let showNote = true;
+
+function speak(text) {
+  stopAudio();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "ja-JP";
+  u.rate = 0.86;
+  u.pitch = 1;
+  const voices = speechSynthesis.getVoices();
+  const ja = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("ja"));
+  if (ja) u.voice = ja;
+  speechSynthesis.speak(u);
+}
+
+function stopAudio() { speechSynthesis.cancel(); }
+
+function renderLessons() {
+  document.getElementById("lessonList").innerHTML = lessons.map((l, i) => `
+    <button class="lesson-btn ${i === currentLesson ? 'active' : ''}" onclick="selectLesson(${i})">${l.title}</button>
+  `).join("");
+}
+
+function renderContent() {
+  const lesson = lessons[currentLesson];
+  document.getElementById("lessonTitle").textContent = lesson.title;
+  document.getElementById("lessonSource").textContent = showNote ? lesson.source : "";
+  document.getElementById("content").innerHTML = lesson.sections.map(section => `
+    <div class="section-title">${section.title}<span class="tag">点读</span></div>
+    ${section.items.map((item, index) => `
+      <div class="card">
+        <div onclick="speak(${JSON.stringify(item[0])})">
+          <div class="jp"><strong>${index + 1}.</strong> ${item[0]}</div>
+          ${showChinese ? `<div class="cn">${item[1] || ''}</div>` : ''}
+        </div>
+        <button class="blue play" onclick="speak(${JSON.stringify(item[0])})">🔊 播放</button>
+      </div>
+    `).join("")}
+  `).join("");
+  renderLessons();
+}
+
+function selectLesson(i) {
+  stopAudio();
+  currentLesson = i;
+  renderContent();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function toggleChinese() { showChinese = !showChinese; renderContent(); }
+function toggleKanaNote() { showNote = !showNote; renderContent(); }
+
+function playLesson() {
+  stopAudio();
+  const items = lessons[currentLesson].sections.flatMap(s => s.items);
+  let i = 0;
+  const next = () => {
+    if (i >= items.length) return;
+    const u = new SpeechSynthesisUtterance(items[i][0]);
+    u.lang = "ja-JP";
+    u.rate = 0.86;
+    u.onend = () => { i++; setTimeout(next, 500); };
+    speechSynthesis.speak(u);
+  };
+  next();
+}
+
+speechSynthesis.onvoiceschanged = () => {};
+renderContent();
+</script>
+</body>
+</html>
